@@ -1,4 +1,4 @@
-version="ALPHA 0.2"
+version="ALPHA 0.3"
 print("Chargement...") # Chargement
 try:
     from tkinter.messagebox import * # Imports
@@ -13,48 +13,46 @@ E=Tk()
 TEXTES=["Expience v"+version] # Liste des textes renseignés plusieurs fois
 E.title("Expience v" + version)
 COULEUR_FOND="#CECECE" # Couleur des fonds de canvas
+LISTE_ELEMENTS_REGLES=[["CH₄","#A9A9A9"],["O₂","#ADD8E6"],["H₂","#F0F8FF"]]
+REGLES=[[["CH₄","O₂"],["#808080","CO₂","#87CEEB","H₂O"]],[["H₂","O₂"],["#87CEEB","H₂O","#87CEEB","H₂O"]]]
 def showinfo_desactive():showinfo("Information","Cette option a été désactivée.") # messagebox d'information : option désactivées
 def ouvrir_propos():web.open("https://github.com/MonsieurOuiplala/expience/")
-def fermer_experience():E
+def fermer_experience():pass
 class tube_a_essai: # Classe pour les tubes à essai
     def __init__(self,x,y,contenu=None,contenu_noms=None,regles=None,afficher_melanger=False):
-        if contenu==None:self.contenu=[COULEUR_FOND]*5
-        if contenu_noms==None:self.contenu_noms=["Air"]*5
-        self.regles = regles if regles is not None else []
+        if contenu==None:self.contenu=[COULEUR_FOND]*2
+        if contenu_noms==None:self.contenu_noms=["Air"]*2
+        self.regles = regles+REGLES if regles is not None else REGLES
         if afficher_melanger:canvas.create_window(x+15,y+240,window=Button(E,text="Mélanger",command=self.melanger))
-        
         self.partie0=canvas.create_polygon(x,y+20,x,y+60,x+30,y+60,x+30,y+20,fill=self.contenu[0],outline="black")
         self.partie1=canvas.create_polygon(x,y+60,x,y+100,x+30,y+100,x+30,y+60,fill=self.contenu[1],outline="black")
-        self.partie2=canvas.create_polygon(x,y+100,x,y+140,x+30,y+140,x+30,y+100,fill=self.contenu[2],outline="black")
-        self.partie3=canvas.create_polygon(x,y+140,x,y+180,x+30,y+180,x+30,y+140,fill=self.contenu[3],outline="black")
-        self.partie4=canvas.create_polygon(x,y+180,x,y+220,x+30,y+220,x+30,y+180,fill=self.contenu[4],outline="black")
+        self.texte0=canvas.create_text(x+15,y+40,text=self.contenu_noms[0])
+        self.texte1=canvas.create_text(x+15,y+80,text=self.contenu_noms[0])
         self.ligne0=canvas.create_line(x,y,x,y+20)
         self.ligne1=canvas.create_line(x,y+20,x+30,y+20)
         self.ligne2=canvas.create_line(x+30,y+20,x+30,y)
     def maj(self):
         try:
-            for j in range(len(self.contenu)):canvas.itemconfig(eval("self.partie"+str(len(self.contenu)-1-j)),fill=self.contenu[j])
+            for j in range(len(self.contenu)):
+                canvas.itemconfig(eval("self.partie"+str(len(self.contenu)-1-j)),fill=self.contenu[j])
+                canvas.itemconfig(eval("self.texte"+str(len(self.contenu)-1-j)),text=self.contenu_noms[j])
         except Exception as e:showerror("Erreur dans le code",e)
-    def ajouter(self,couleur,nom):
-        for i in range(len(self.contenu)):
-            if self.contenu[i]==COULEUR_FOND:
-                self.contenu[i]=couleur
-                self.contenu_noms[i]=nom
-                self.maj()
-                break
+    def modifier(self,position,couleur,nom):
+        self.contenu[position]=couleur
+        self.contenu_noms[position]=nom
+        self.maj()
     def definir(self,nouveau_contenu,nouveaux_noms):
         self.contenu=nouveau_contenu
         self.contenu_noms=nouveaux_noms
     def melanger(self):
-        if not self.regles:return
+        if not self.regles:
+            return
         for conditions, resultats in self.regles:
             if all(elem in self.contenu_noms for elem in conditions):
-                couleur_resultat, nom_resultat = resultats
-                for i in range(len(self.contenu_noms)):
-                    if self.contenu_noms[i] in conditions:
-                        self.contenu[i] = couleur_resultat
-                        self.contenu_noms[i] = nom_resultat
-                self.maj()
+                couleur_resultat_0, nom_resultat_0, couleur_resultat_1, nom_resultat_1 = resultats
+                self.contenu[0], self.contenu_noms[0] = couleur_resultat_0, nom_resultat_0
+                self.contenu[1], self.contenu_noms[1] = couleur_resultat_1, nom_resultat_1
+            self.maj()
 
 Label(E,text=TEXTES[0]).pack()
 print("Chargement des expériences...")
@@ -96,6 +94,25 @@ def sulfate_de_cuivre_anhydre():
     canvas.create_window(60, 200, window=Button(E,text="Tomate",command=lambda:sca_reaction("Tomate")))
     canvas.create_window(60, 230, window=Button(E,text="Papier",command=lambda:sca_reaction("Papier")))
 
+def tube_a_essai_libre():
+    global canvas
+    canvas=Canvas(E,width=750,height=500,background=COULEUR_FOND)
+    canvas.pack()
+    tube=tube_a_essai(350,100,afficher_melanger=True)
+    elements_noms=[elem[0] for elem in LISTE_ELEMENTS_REGLES]
+    def mettre_a_jour_tube(index,choix):
+        couleur=next((elem[1] for elem in LISTE_ELEMENTS_REGLES if elem[0]==choix),COULEUR_FOND)
+        tube.modifier(index,couleur,choix)
+    choix0=StringVar()
+    choix0.set(elements_noms[0])
+    choix1=StringVar()
+    choix1.set(elements_noms[0])
+    menu_choix0=OptionMenu(E,choix0,*elements_noms,command=lambda choix:mettre_a_jour_tube(1,choix))
+    menu_choix1=OptionMenu(E,choix1,*elements_noms,command=lambda choix:mettre_a_jour_tube(0,choix))
+    canvas.create_window(250,140,window=menu_choix0)
+    canvas.create_window(250,180,window=menu_choix1)
+
+
 menu=Menu(E) # Barre d'outils
 smenu0=Menu(menu,tearoff=0)
 smenu0.add_command(label="Quitter",command=E.destroy)
@@ -104,6 +121,7 @@ smenu1=Menu(menu,tearoff=0)
 smenu1.add_command(label="Nouvelle expérience",command=showinfo_desactive)
 smenu1.add_command(label="Ouvrir expérience",command=showinfo_desactive)
 smenu1.add_command(label="Sulfate de cuivre anhydre (SCA)",command=sulfate_de_cuivre_anhydre)
+smenu1.add_command(label="Tube à essai libre (TAE)",command=tube_a_essai_libre)
 menu.add_cascade(label="Expérience",menu=smenu1)
 smenu2=Menu(menu,tearoff=0)
 smenu2.add_command(label="À propos",command=ouvrir_propos)
