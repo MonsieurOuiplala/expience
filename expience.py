@@ -1,4 +1,4 @@
-version="ALPHA 0.3"
+version="ALPHA 0.3.1"
 print("Chargement...") # Chargement
 try:
     from tkinter.messagebox import * # Imports
@@ -13,8 +13,8 @@ E=Tk()
 TEXTES=["Expience v"+version] # Liste des textes renseignés plusieurs fois
 E.title("Expience v" + version)
 COULEUR_FOND="#CECECE" # Couleur des fonds de canvas
-LISTE_ELEMENTS_REGLES=[["CH₄","#A9A9A9"],["O₂","#ADD8E6"],["H₂","#F0F8FF"]]
-REGLES=[[["CH₄","O₂"],["#808080","CO₂","#87CEEB","H₂O"]],[["H₂","O₂"],["#87CEEB","H₂O","#87CEEB","H₂O"]]]
+LISTE_ELEMENTS_REGLES=[["CH₄","#A9A9A9"],["2O₂","#ADD8E6"],["O₂","#ADD8E6"],["2H₂","#F0F8FF"],["2Na","#C0C0C0"],["HCl","#F0FFF0"],["NaOH","#FFFFE0"]]
+REGLES=[[["CH₄","2O₂"],["#808080","CO₂","#87CEEB","2H₂O"]],[["2H₂","O₂"],["#87CEEB","H₂O","#87CEEB","H₂O"]],[["2Na","Cl₂"],["#FFFFFF","NaCl","#FFFFFF","NaCl"]],[["HCl","NaOH"],["#FFFFFF","NaCl","#87CEEB","H₂O"]]]
 def showinfo_desactive():showinfo("Information","Cette option a été désactivée.") # messagebox d'information : option désactivées
 def ouvrir_propos():web.open("https://github.com/MonsieurOuiplala/expience/")
 def fermer_experience():pass
